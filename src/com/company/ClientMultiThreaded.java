@@ -6,15 +6,20 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class ClientMultiThreaded extends Thread {
     CloseableHttpClient httpClient;
     HttpPost httpPost;
     int id;
+    String url;
 
-    public ClientMultiThreaded(CloseableHttpClient httpClient, HttpPost httpPost, int id) {
+    public ClientMultiThreaded(CloseableHttpClient httpClient, HttpPost httpPost, int id, String url) {
         this.httpClient = httpClient;
         this.httpPost = httpPost;
         this.id = id;
+        this.url = url;
     }
 
     @Override
@@ -29,9 +34,13 @@ public class ClientMultiThreaded extends Thread {
             if (entity != null) {
                 System.out.printf("Bytes read by thread thread %d:%d%n", id, EntityUtils.toByteArray(entity).length);
                 System.out.println(httpresponse.getStatusLine());
+                Main.log(Main.successFilePath, this.url);
+            }else {
+                Main.log(Main.failedFilePath, this.url);
             }
         }catch(Exception e) {
             System.out.println(e.getMessage());
+            Main.log(Main.failedFilePath, this.url);
         }
     }
 }
